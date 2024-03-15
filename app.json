@@ -1,4 +1,5 @@
 {
   "name": "emau",
-  "displayName": "emau"
+  "displayName": "emau",
+  "orientation": "landscape"
 }
