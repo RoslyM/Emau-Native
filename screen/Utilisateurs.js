@@ -246,7 +246,7 @@ console.log("Mot de passe déchiffré :", decryptedPassword);
           <View style={styles.modalView}>
            
            <View className="flex flex-row items-center justify-between">
-                <Text className="font-[500]  text-gray-800 ">{edit?'Modifier un Service':'Ajouter un Service'}</Text>
+                <Text className="font-[500]  text-gray-800 ">{edit?'Modifier un Service':'Ajouter un utilisateur'}</Text>
                 <Pressable
                     onPress={() => setModalVisible(!modalVisible)}>
                         <Icon.XOctagon width={30} height={30} stroke='#00b292'/>

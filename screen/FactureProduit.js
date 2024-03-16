@@ -5,10 +5,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Icon from "react-native-feather";
 import { useDispatch, useSelector } from 'react-redux';
 import {initializeProduit} from '../slice/redux'
-// import { printToFileAsync } from 'expo-print';
-// import { shareAsync } from 'expo-sharing';
-// import { Asset } from 'expo-asset';
-// import { manipulateAsync } from 'expo-image-manipulator';
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
+import {image} from "../assets/base64/image"
+import Share from 'react-native-share';
 import {initializeHistoriqueP} from '../slice/redux'
 
 
@@ -149,8 +148,7 @@ export default function ServiceView() {
             alert("Votre facture est vide")
         }else{
            
-            const asset = Asset.fromModule(require('../assets/images/logo.png'));
-            const image = await manipulateAsync(asset.localUri ?? asset.uri, [], { base64: true });
+          
         
             // Générer les éléments HTML pour les services
             let servicesHtml = '';
@@ -162,7 +160,7 @@ export default function ServiceView() {
                             <span style="display:flex; justify-content: space-between;
                             align-items: center; margin-bottom:15px">
                                 <span>*${item.count}</span>
-                                <span>${item.count}/${item.prix} €</span>
+                                <span>${item.count}/${item.prix} FCFA</span>
                             </span>
                       `;
                 servicesHtml += serviceHtml;
@@ -178,7 +176,7 @@ export default function ServiceView() {
             <html>
                 <body style="width: 300px; padding: 5px;font-size:15px;">
                 <div style="text-align: center;">
-                <img alt="logo" src="data:image/jpeg;base64,${image.base64}" width="80" />
+                <img alt="logo" src="${image}" width="80"/>
                 <h3>Emau Main d'Or</h3>
                 <hr>
                 </div>
@@ -192,13 +190,30 @@ export default function ServiceView() {
             `;
         
             // Imprimer le fichier PDF
-            const file = await printToFileAsync({
-                html: html,
-                base64: false
-            });
+            const file = await RNHTMLtoPDF.convert({
+              html: html,
+              file:"html_to_pdf",
+              directory:"Documents",
+              base64: false
+          });
         
-            // Partager le fichier PDF
-            await shareAsync(file.uri);
+          //Partager PDF
+          try {
+            const pdf = await RNHTMLtoPDF.convert({
+              html: html,
+              file:"html_to_pdf",
+              directory:"Documents",
+              base64: false
+          });
+            const shareOptions = {
+              title: 'Share PDF',
+              url: `file://${pdf.filePath}`,
+              type: 'application/pdf',
+            };
+            await Share.open(shareOptions);
+          } catch (error) {
+            // console.error('Error generating PDF or sharing:', error.message);
+          }
             setDisabled(false)
             setModalVisibleDelete(false)
         }
@@ -286,7 +301,7 @@ export default function ServiceView() {
                 <View className=" bg-white py-5 w-full">
                      <View className="flex flex-row justify-between items-center w-full px-5 ">
                         <Text className=" text-gray-600">Total : </Text>
-                        <Text className="text-base font-[700]">{total} Fcfa</Text>
+                        <Text className="text-base font-[700]">{total} FCFA</Text>
                     </View>
                     <View className="px-5 mt-5">
                             <TouchableOpacity activeOpacity={1} delayPressIn={0} delayPressOut={0} onPress={handleCalculateTotal}  className="bg-[#00b292]  py-3 flex flex-row justify-center rounded-lg space-x-5 items-center">
@@ -310,7 +325,7 @@ export default function ServiceView() {
           <View className="flex flex-row items-center justify-between mb-3">
                  <Text className="font-[500] text-base text-gray-800 ">Récapitulatif de la facture</Text>
                 <Pressable
-                    onPress={() => setModalVisibleDelete(!modalVisibleDelete)}>
+                    onPress={() => {setModalVisibleDelete(!modalVisibleDelete);setDisabled(false)}}>
                         <Icon.XOctagon width={30} height={30} stroke='#00b292'/>
                 </Pressable>  
            </View>

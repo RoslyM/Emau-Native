@@ -68,7 +68,7 @@ const LoginScreen = ({ navigation }) => {
   }
 
   return (
-    <SafeAreaView className="bg-white h-full pt-5">
+    <SafeAreaView className="bg-white h-full ">
      <StatusBar barStyle='dark-content' backgroundColor='#fff'/>
 
    
