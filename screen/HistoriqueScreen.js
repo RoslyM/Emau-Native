@@ -22,7 +22,7 @@ export default function ServiceView() {
       useEffect(() => {
         setData(historique);
         setDataP(historiqueP)
-        console.log("Historique Produit : ", historiqueP)
+        console.log("Historique Service : ", historique)
         setLoading(false);
       }, [historique,historiqueP]);
 
@@ -64,13 +64,13 @@ export default function ServiceView() {
       const deleteItem = async id => {
         try {
           setLoading(true)
-          const updatedData = pageService? data.filter(item => item.id !== id):dataP.filter(item => item.id !== id); 
-          await AsyncStorage.setItem('historiquesP', JSON.stringify(updatedData));
-          
+          const updatedData = pageService? data.filter(item => item.id != id):dataP.filter(item => item.id != id); 
+          pageService? await AsyncStorage.setItem('historiques', JSON.stringify(updatedData)):await AsyncStorage.setItem('historiquesP', JSON.stringify(updatedData))
           //await AsyncStorage.clear();
           initializeHistorique()
           initializeHistoriqueP()
-          
+          console.log("Données : ",data)
+          console.log("Object : ", updatedData)
         } catch (error) {
           console.error('Erreur lors de la suppression des données : ', error);
         }
@@ -130,7 +130,7 @@ export default function ServiceView() {
                             <Text className="pb-3 text-gray-800">Facture ID : {id}</Text>
                             <Text className="pb-3 text-gray-800">Date : {date}</Text>
                         </View> 
-                        <TouchableOpacity onPress={()=>deleteItem(id)}><Text>Supprimer</Text></TouchableOpacity>
+                        {/* <TouchableOpacity onPress={()=>deleteItem(id)}><Text>Supprimer</Text></TouchableOpacity> */}
                     </View>
                 </TouchableOpacity>
                   )

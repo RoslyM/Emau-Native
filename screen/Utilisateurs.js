@@ -5,6 +5,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Icon from "react-native-feather";
 import { useDispatch, useSelector } from 'react-redux';
 import {initializeReduxStoreWithData, deleteUser} from '../slice/redux'
+import { Formik } from 'formik';
+import * as yup from 'yup';
+
+const validationSchema = yup.object().shape({
+  username: yup.string().required('Le nom est requis'),
+  password: yup.string().required('Le mot de passe est requis'),
+});
 
 export default function ServiceView() {
 
@@ -51,10 +58,10 @@ export default function ServiceView() {
 
   
 
-      const handleService = async () => {
+      const handleService = async (values) => {
 
         try {
-          const newItem = { id: Date.now(), username: username, password: password };
+          const newItem = { id: Date.now(), username: values.username, password: values.password };
           const mesData = data.filter(item => item.username == newItem.username)
 
           if (editData !== '') {
@@ -242,11 +249,18 @@ console.log("Mot de passe déchiffré :", decryptedPassword);
           Alert.alert('Modal has been closed.');
           setModalVisible(!modalVisible);
         }}>
+          <Formik
+      initialValues={{ username: edit ?username : '', password: edit?password:'' }}
+      validationSchema={validationSchema}
+      onSubmit={(values) => handleService(values)}
+    >
+       
+    {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
         <View style={styles.centeredView} >
           <View style={styles.modalView}>
            
-           <View className="flex flex-row items-center justify-between">
-                <Text className="font-[500]  text-gray-800 ">{edit?'Modifier un Service':'Ajouter un utilisateur'}</Text>
+          <View className="flex flex-row items-center justify-between">
+                <Text className="font-[500]  text-gray-800 ">{edit?'Modifier un utilisateur':'Ajouter un utilisateur'}</Text>
                 <Pressable
                     onPress={() => setModalVisible(!modalVisible)}>
                         <Icon.XOctagon width={30} height={30} stroke='#00b292'/>
@@ -255,46 +269,53 @@ console.log("Mot de passe déchiffré :", decryptedPassword);
            
 
               <Text className="text-gray-800  font-[500]  py-2">Nom de l'utilisateur</Text>
-          <View className="flex flex-row justify-between items-center mt-1 border-2 px-4  border-gray-200 rounded-xl">
+              <View className={`flex flex-row justify-between items-center mt-1 border-2 px-4 rounded-xl ${touched.username && errors.username ? 'border-red-500' : 'border-gray-200'}`}>
             <TextInput
               className="text-gray-800  font-[500] py-2 flex-1"
               placeholderTextColor="gray"
               placeholder="Entrer le nom de l'utilisateur"
-             value={username}
-            onChangeText={(text) => setUsername(text)}
+              defaultValue={username}
+             onBlur={handleBlur('username')}
+            onChangeText={handleChange('username')}
             />
           </View>
+          {touched.username && errors.username && <Text className="pt-2" style={{ color: 'red' }}>{errors.username}</Text>}
           <Text className="py-2 text-gray-800  font-[600]">Mot de passe</Text>
-          <View className="flex flex-row justify-between items-center mt-1 mb-5 border-2 px-4  border-gray-200 rounded-xl">
+          <View className={`flex flex-row justify-between items-center mt-1 border-2 px-4 rounded-xl  ${touched.password && errors.password ? 'border-red-500' : 'border-gray-200 mb-5'}`}>
+         
           <TextInput
             className="text-gray-800  font-[500] py-2 flex-1"
             placeholderTextColor="gray"
-            keyboardType="numeric"
             placeholder="Entrer le mot de passe"
+            defaultValue={password}
             secureTextEntry={!showPassword}
-            value={password}
-            onChangeText={(text) => setPassword(text)}
+            onChangeText={handleChange('password')}
+            onBlur={handleBlur('password')}
           />
 
 <TouchableOpacity onPress={toggleShowPassword}>
            {showPassword ? <Icon.EyeOff className="text-gray-800" width={20} />  : <Icon.Eye className="text-gray-800" width={20} />}
        
       </TouchableOpacity>
-          
+  
+     
           </View>
+          {touched.password && errors.password && <Text className="pt-2 mb-5" style={{ color: 'red' }}>{errors.password}</Text>}
           
           
           <View className="flex flex-row space-x-5 items-center">
                 <TouchableOpacity activeOpacity={1} delayPressIn={0} delayPressOut={0}  className="py-2 border-2 border-gray-200 rounded-lg w-full flex-1" onPress={() => setModalVisible(!modalVisible)}>
                     <Text className="text-md text-gray-800  font-[600] pb-1 text-center">Annuler</Text>
                 </TouchableOpacity>
-                <TouchableOpacity activeOpacity={1} delayPressIn={0} delayPressOut={0}  className="bg-[#00b292] py-2 rounded-lg w-full flex-1" onPress={handleService}>
+                <TouchableOpacity activeOpacity={1} delayPressIn={0} delayPressOut={0}  className="bg-[#00b292] py-2 rounded-lg w-full flex-1" onPress={handleSubmit}>
               <Text className="text-md text-white font-[600] pb-1 text-center">{edit?'Modifier':'Ajouter'}</Text>
              </TouchableOpacity>
           </View>
           </View>
         </View>
-
+)}
+       
+</Formik>
         
       </Modal>
 
