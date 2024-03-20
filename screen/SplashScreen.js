@@ -18,11 +18,11 @@ const SplashScreen = () => {
 
   const checkIfLoggedIn = async () => {
     const userToken = await AsyncStorage.getItem('userToken');
-    if (!userToken) {
+    // if (!userToken) {
       navigation.replace('Login');
-    }else{
-      navigation.replace('Home'); 
-    }
+    // }else{
+    //   navigation.replace('Home'); 
+    // }
   };
 
   return (

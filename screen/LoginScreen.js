@@ -29,9 +29,9 @@ const LoginScreen = ({ navigation }) => {
 
   const checkIfLoggedIn = async () => {
     const userToken = await AsyncStorage.getItem('userToken');
-    if (userToken) {
-      navigation.navigate('Home');
-    }
+    // if (userToken) {
+    //   navigation.navigate('Home');
+    // }
   };
 
   const handleLogin = async (values) => {

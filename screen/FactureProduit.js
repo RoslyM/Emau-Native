@@ -9,6 +9,7 @@ import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import {image} from "../assets/base64/image"
 import Share from 'react-native-share';
 import {initializeHistoriqueP} from '../slice/redux'
+import { codeBar } from '../assets/base64/codeBar';
 
 
 export default function ServiceView() {
@@ -113,6 +114,7 @@ export default function ServiceView() {
       let generatePdf = async () => {
         setDisabled(true)
         const currentDateTime = new Date();
+        const id = Date.now()
         const formattedDateTime = currentDateTime.toLocaleString()
         const user = await AsyncStorage.getItem('userToken');
 
@@ -120,7 +122,7 @@ export default function ServiceView() {
 
                 const newItem = {
                     utilisateur : user,
-                    id: Date.now(),
+                    id: id,
                     date: formattedDateTime,
                     data: dataImpression,
                     montant: total
@@ -155,11 +157,9 @@ export default function ServiceView() {
             let total = 0;
             dataImpression.forEach(item => {
                 const serviceHtml = `
-                      
-                            ${item.name}
                             <span style="display:flex; justify-content: space-between;
                             align-items: center; margin-bottom:15px">
-                                <span>*${item.count}</span>
+                                <span>${item.name}</span>
                                 <span>${item.count}/${item.prix} FCFA</span>
                             </span>
                       `;
@@ -167,35 +167,49 @@ export default function ServiceView() {
                 total += parseInt(item.prix, 10) * item.count;
             });
         
-            // Formater la date et l'heure selon vos besoins
-            
-        
-            // Générer le HTML final avec taille A4 et centrage du contenu
+            const jour = currentDateTime.getDate().toString().padStart(2, '0');
+            const mois = (currentDateTime.getMonth() + 1).toString().padStart(2, '0');
+            const annee = currentDateTime.getFullYear();
+            const heure = currentDateTime.getHours().toString().padStart(2, '0');
+            const minutes = currentDateTime.getMinutes().toString().padStart(2, '0');
+            const secondes = currentDateTime.getSeconds().toString().padStart(2, '0');
             
             const html = `
             <html>
-                <body style="width: 300px; padding: 5px;font-size:15px;">
+                <body style="width: 300px;font-size:15px;">
                 <div style="text-align: center;">
-                <img alt="logo" src="${image}" width="80"/>
+                <img alt="logo" src="${image}" width="120"/>
                 <h3>Emau Main d'Or</h3>
+                <p>34, rue loudima Mougali</p>
+                <p>Tél: 06 810 22 88</p>
+                <p>Vendeur : Rosly</p>
                 <hr>
                 </div>
                 <div style="padding: 10px;margin: 10px;font-size:15px;">
                     <p>${servicesHtml}</p>
-                    <h3>Total : ${total} FCFA</h3>
-                    <p>Merci pour votre confiance. Contactez-nous pour toute question.</p>
+                    <p>Nbre d'art : ${dataImpression.length}</p>
+                    <div style="display:flex; justify-content: space-between;
+                    align-items: center;">
+                    <h3>Total : </h3>
+                    <h3>${total} FCFA</h3>
+                    </div>
+                   
+                    <p>Date : ${jour}/${mois}/${annee} <span style="padding-left: 10px;">à</span>  <span style="padding-left: 10px;">${heure}:${minutes}:${secondes}</span> </p>
+                    <div style="display: flex; flex-direction:column; align-items: center; width:100%">
+                    <img  alt="logo" src="${codeBar}" width="120"/>
+                    <p style="margin-top:-4px">${id}</p>
+            </div>
+            <div style="margin-top:-12px">
+                <hr style="border-top: 1px dashed #000;">
+                <hr style="border-top: 1px dashed #000; margin-top:-7px">
+                <p style="text-align: center; margin-top:-1px">Merci de votre visite . <br> A bientôt .</p>
+            </div> 
+                    
                 </div>       
                 </body>
             </html>
             `;
         
-            // Imprimer le fichier PDF
-            const file = await RNHTMLtoPDF.convert({
-              html: html,
-              file:"html_to_pdf",
-              directory:"Documents",
-              base64: false
-          });
         
           //Partager PDF
           try {
